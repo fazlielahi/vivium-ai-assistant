@@ -1,0 +1,1 @@
+$table->dateTime('appointment_date');

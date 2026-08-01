@@ -18,7 +18,7 @@ return new class extends Migration
             $table->string('phone');
             $table->string('service');
         
-            $table->dateTime('appointment_date');
+            $table->string('appointment_date');
         
             $table->timestamps();
         });

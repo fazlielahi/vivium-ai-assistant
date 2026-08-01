@@ -36,9 +36,9 @@
 
                 </div>
 
-                <div id="typing" style="display:none;">
-                    <div class="bg-light border rounded p-2 d-inline-block">
-                        <span class="spinner-border spinner-border-sm"></span>
+                <div id="typing" class="text-start mb-2" style="display:none;">
+                    <div class="bg-secondary text-white rounded p-2 d-inline-block">
+                        <span class="spinner-border spinner-border-sm me-2"></span>
                         Vivium Assistant is typing...
                     </div>
                 </div>
@@ -70,7 +70,7 @@
     </div>
 
     <script>
-        document.getElementById('chat-form').addEventListener('submit', async function(e) {
+        document.getElementById('chat-form').addEventListener('submit', async function (e) {
 
             e.preventDefault();
 
@@ -88,37 +88,23 @@
             userDiv.className = 'text-end mb-2';
 
             userDiv.innerHTML = `
-        <span class="bg-primary text-white rounded p-2 d-inline-block">
-            ${userMessage}
-        </span>
-    `;
+                <span class="bg-primary text-white rounded p-2 d-inline-block">
+                    ${userMessage}
+                </span>
+            `;
 
             chatBox.appendChild(userDiv);
 
-            chatBox.scrollTop = chatBox.scrollHeight;
-
             input.value = "";
+
+            chatBox.scrollTop = chatBox.scrollHeight;
 
             // Disable button
             button.disabled = true;
 
-            // Show typing
-
-            typing.id = "typing";
-
-            typing.className = "text-start mb-2";
-
-            typing.innerHTML = `
-    <div class="bg-secondary text-white rounded p-2 d-inline-block">
-        <span class="spinner-border spinner-border-sm me-2"></span>
-        Vivium Assistant is typing...
-    </div>
-`;
-
+            // Show typing indicator
+            typing.style.display = "block";
             chatBox.appendChild(typing);
-
-            chatBox.scrollTop = chatBox.scrollHeight;
-
             chatBox.scrollTop = chatBox.scrollHeight;
 
             const token = document.querySelector('meta[name="csrf-token"]').content;
@@ -126,69 +112,53 @@
             try {
 
                 const response = await fetch('/chat', {
-
                     method: 'POST',
-
                     headers: {
-
                         'Content-Type': 'application/json',
-
                         'X-CSRF-TOKEN': token
-
                     },
-
                     body: JSON.stringify({
-
                         message: userMessage
-
                     })
-
                 });
 
                 const data = await response.json();
 
                 // Hide typing
-                typing.remove();
+                typing.style.display = "none";
 
+                // Assistant message
                 const aiDiv = document.createElement('div');
-
                 aiDiv.className = 'text-start mb-2';
 
                 aiDiv.innerHTML = `
-            <div class="bg-secondary text-white rounded p-2 d-inline-block markdown-body">
-
-                ${window.marked
-                    ? window.marked.parse(data.reply)
-                    : data.reply}
-
-            </div>
-        `;
+                    <div class="bg-secondary text-white rounded p-2 d-inline-block markdown-body">
+                        ${window.marked
+                            ? window.marked.parse(data.reply)
+                            : data.reply}
+                    </div>
+                `;
 
                 chatBox.appendChild(aiDiv);
 
             } catch (err) {
 
-                typing.remove();
+                typing.style.display = "none";
 
                 console.error(err);
 
                 const errorDiv = document.createElement('div');
-
                 errorDiv.className = 'text-start text-danger mb-2';
-
                 errorDiv.innerHTML = `
-            Error contacting assistant.
-            Please try again.
-        `;
+                    Error contacting assistant. Please try again.
+                `;
 
                 chatBox.appendChild(errorDiv);
 
             } finally {
 
                 button.disabled = false;
-
                 input.focus();
-
                 chatBox.scrollTop = chatBox.scrollHeight;
 
             }
